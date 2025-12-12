@@ -1,30 +1,63 @@
 import { UserPlus, Calendar, FileText, Send } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
+interface QuickActionsProps {
+  onAddEmployee?: () => void;
+  onApplyLeave?: () => void;
+  onGenerateReport?: () => void;
+  onSendNotification?: () => void;
+}
+
 const actions = [
   {
     label: 'Add Employee',
     icon: UserPlus,
     description: 'Onboard new team member',
+    action: 'addEmployee',
   },
   {
     label: 'Apply Leave',
     icon: Calendar,
     description: 'Submit leave request',
+    action: 'applyLeave',
   },
   {
     label: 'Generate Report',
     icon: FileText,
     description: 'Create custom report',
+    action: 'generateReport',
   },
   {
     label: 'Send Notification',
     icon: Send,
     description: 'Broadcast to employees',
+    action: 'sendNotification',
   },
 ];
 
-export function QuickActions() {
+export function QuickActions({
+  onAddEmployee,
+  onApplyLeave,
+  onGenerateReport,
+  onSendNotification,
+}: QuickActionsProps) {
+  const handleClick = (action: string) => {
+    switch (action) {
+      case 'addEmployee':
+        onAddEmployee?.();
+        break;
+      case 'applyLeave':
+        onApplyLeave?.();
+        break;
+      case 'generateReport':
+        onGenerateReport?.();
+        break;
+      case 'sendNotification':
+        onSendNotification?.();
+        break;
+    }
+  };
+
   return (
     <div className="rounded-xl border border-border bg-card p-6 shadow-card">
       <h3 className="font-display text-lg font-semibold text-card-foreground mb-4">
@@ -38,6 +71,7 @@ export function QuickActions() {
               key={action.label}
               variant="secondary"
               className="h-auto flex-col gap-2 p-4 hover:bg-accent/10 hover:border-accent/30"
+              onClick={() => handleClick(action.action)}
             >
               <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent/10">
                 <Icon className="h-5 w-5 text-accent" />

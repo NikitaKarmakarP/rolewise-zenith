@@ -13,9 +13,11 @@ import { format, parseISO } from 'date-fns';
 interface EmployeeCardProps {
   employee: User;
   variant?: 'grid' | 'list';
+  onViewProfile?: (employee: User) => void;
+  onViewLeaveHistory?: (employee: User) => void;
 }
 
-export function EmployeeCard({ employee, variant = 'grid' }: EmployeeCardProps) {
+export function EmployeeCard({ employee, variant = 'grid', onViewProfile, onViewLeaveHistory }: EmployeeCardProps) {
   const getInitials = (firstName: string, lastName: string) => {
     return `${firstName[0]}${lastName[0]}`.toUpperCase();
   };
@@ -75,9 +77,9 @@ export function EmployeeCard({ employee, variant = 'grid' }: EmployeeCardProps) 
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem>View Profile</DropdownMenuItem>
-            <DropdownMenuItem>Edit Details</DropdownMenuItem>
-            <DropdownMenuItem>View Leave History</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => onViewProfile?.(employee)}>View Profile</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => onViewProfile?.(employee)}>Edit Details</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => onViewLeaveHistory?.(employee)}>View Leave History</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
@@ -124,7 +126,7 @@ export function EmployeeCard({ employee, variant = 'grid' }: EmployeeCardProps) 
       </div>
 
       <div className="mt-4 flex gap-2">
-        <Button variant="secondary" size="sm" className="flex-1">
+        <Button variant="secondary" size="sm" className="flex-1" onClick={() => onViewProfile?.(employee)}>
           View Profile
         </Button>
         <DropdownMenu>
@@ -134,8 +136,8 @@ export function EmployeeCard({ employee, variant = 'grid' }: EmployeeCardProps) 
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem>Edit Details</DropdownMenuItem>
-            <DropdownMenuItem>View Leave History</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => onViewProfile?.(employee)}>Edit Details</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => onViewLeaveHistory?.(employee)}>View Leave History</DropdownMenuItem>
             <DropdownMenuItem>Send Message</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
