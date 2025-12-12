@@ -18,12 +18,24 @@ import {
   Filter,
   Download,
 } from 'lucide-react';
-import { currentUser, mockUsers, mockDepartments } from '@/data/mockData';
+import { currentUser, mockUsers, mockDepartments, mockLeaveRequests, mockLeaveBalances } from '@/data/mockData';
+import { AddEmployeeDialog } from '@/components/dialogs/AddEmployeeDialog';
+import { EmployeeProfileDialog } from '@/components/dialogs/EmployeeProfileDialog';
+import { ApplyLeaveDialog } from '@/components/dialogs/ApplyLeaveDialog';
+import { toast } from 'sonner';
+import type { User as UserType } from '@/types/hrms';
 
 export default function Employees() {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [searchQuery, setSearchQuery] = useState('');
   const [departmentFilter, setDepartmentFilter] = useState('all');
+  
+  // Dialog states
+  const [addEmployeeOpen, setAddEmployeeOpen] = useState(false);
+  const [selectedEmployee, setSelectedEmployee] = useState<UserType | null>(null);
+  const [profileDialogOpen, setProfileDialogOpen] = useState(false);
+  const [applyLeaveOpen, setApplyLeaveOpen] = useState(false);
+  const [leaveEmployee, setLeaveEmployee] = useState<UserType | null>(null);
 
   const filteredEmployees = mockUsers.filter((employee) => {
     const matchesSearch =
@@ -37,6 +49,55 @@ export default function Employees() {
 
     return matchesSearch && matchesDepartment;
   });
+
+  const handleViewProfile = (employee: UserType) => {
+    setSelectedEmployee(employee);
+    setProfileDialogOpen(true);
+  };
+
+  const handleViewLeaveHistory = (employee: UserType) => {
+    setSelectedEmployee(employee);
+    setProfileDialogOpen(true);
+  };
+
+  const handleApplyLeave = (employee: UserType) => {
+    setLeaveEmployee(employee);
+    setApplyLeaveOpen(true);
+  };
+
+  const handleExport = () => {
+    const csvContent = [
+      ['ID', 'Name', 'Email', 'Department', 'Position', 'Role', 'Date of Joining'].join(','),
+      ...filteredEmployees.map(emp => 
+        [
+          emp.id,
+          `${emp.firstName} ${emp.lastName}`,
+          emp.email,
+          emp.department,
+          emp.position,
+          emp.role,
+          emp.dateOfJoining
+        ].join(',')
+      )
+    ].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'employees.csv';
+    a.click();
+    window.URL.revokeObjectURL(url);
+    toast.success('Employee list exported successfully!');
+  };
+
+  const getEmployeeLeaveHistory = (employeeId: string) => {
+    return mockLeaveRequests.filter(req => req.userId === employeeId);
+  };
+
+  const getEmployeeLeaveBalances = (employeeId: string) => {
+    return mockLeaveBalances.filter(bal => bal.userId === employeeId);
+  };
 
   return (
     <DashboardLayout user={currentUser} pageTitle="Employees">
@@ -86,11 +147,11 @@ export default function Employees() {
                 <List className="h-4 w-4" />
               </Button>
             </div>
-            <Button variant="outline" size="sm">
+            <Button variant="outline" size="sm" onClick={handleExport}>
               <Download className="mr-2 h-4 w-4" />
               Export
             </Button>
-            <Button variant="accent" size="sm">
+            <Button variant="accent" size="sm" onClick={() => setAddEmployeeOpen(true)}>
               <UserPlus className="mr-2 h-4 w-4" />
               Add Employee
             </Button>
@@ -114,7 +175,13 @@ export default function Employees() {
                 className="animate-fade-in-up"
                 style={{ animationDelay: `${index * 50}ms` }}
               >
-                <EmployeeCard employee={employee} variant="grid" />
+                <EmployeeCard 
+                  employee={employee} 
+                  variant="grid" 
+                  onViewProfile={() => handleViewProfile(employee)}
+                  onViewLeaveHistory={() => handleViewLeaveHistory(employee)}
+                  onApplyLeave={() => handleApplyLeave(employee)}
+                />
               </div>
             ))}
           </div>
@@ -126,7 +193,13 @@ export default function Employees() {
                 className="animate-fade-in-up"
                 style={{ animationDelay: `${index * 30}ms` }}
               >
-                <EmployeeCard employee={employee} variant="list" />
+                <EmployeeCard 
+                  employee={employee} 
+                  variant="list" 
+                  onViewProfile={() => handleViewProfile(employee)}
+                  onViewLeaveHistory={() => handleViewLeaveHistory(employee)}
+                  onApplyLeave={() => handleApplyLeave(employee)}
+                />
               </div>
             ))}
           </div>
@@ -153,6 +226,26 @@ export default function Employees() {
           </div>
         )}
       </div>
+
+      {/* Dialogs */}
+      <AddEmployeeDialog
+        open={addEmployeeOpen}
+        onOpenChange={setAddEmployeeOpen}
+        departments={mockDepartments}
+      />
+
+      <EmployeeProfileDialog
+        employee={selectedEmployee}
+        open={profileDialogOpen}
+        onOpenChange={setProfileDialogOpen}
+        leaveHistory={selectedEmployee ? getEmployeeLeaveHistory(selectedEmployee.id) : []}
+        leaveBalances={selectedEmployee ? getEmployeeLeaveBalances(selectedEmployee.id) : []}
+      />
+
+      <ApplyLeaveDialog
+        open={applyLeaveOpen}
+        onOpenChange={setApplyLeaveOpen}
+      />
     </DashboardLayout>
   );
 }

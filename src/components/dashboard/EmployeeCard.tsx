@@ -15,9 +15,10 @@ interface EmployeeCardProps {
   variant?: 'grid' | 'list';
   onViewProfile?: (employee: User) => void;
   onViewLeaveHistory?: (employee: User) => void;
+  onApplyLeave?: (employee: User) => void;
 }
 
-export function EmployeeCard({ employee, variant = 'grid', onViewProfile, onViewLeaveHistory }: EmployeeCardProps) {
+export function EmployeeCard({ employee, variant = 'grid', onViewProfile, onViewLeaveHistory, onApplyLeave }: EmployeeCardProps) {
   const getInitials = (firstName: string, lastName: string) => {
     return `${firstName[0]}${lastName[0]}`.toUpperCase();
   };
@@ -80,6 +81,7 @@ export function EmployeeCard({ employee, variant = 'grid', onViewProfile, onView
             <DropdownMenuItem onClick={() => onViewProfile?.(employee)}>View Profile</DropdownMenuItem>
             <DropdownMenuItem onClick={() => onViewProfile?.(employee)}>Edit Details</DropdownMenuItem>
             <DropdownMenuItem onClick={() => onViewLeaveHistory?.(employee)}>View Leave History</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => onApplyLeave?.(employee)}>Apply Leave</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
@@ -138,7 +140,7 @@ export function EmployeeCard({ employee, variant = 'grid', onViewProfile, onView
           <DropdownMenuContent align="end">
             <DropdownMenuItem onClick={() => onViewProfile?.(employee)}>Edit Details</DropdownMenuItem>
             <DropdownMenuItem onClick={() => onViewLeaveHistory?.(employee)}>View Leave History</DropdownMenuItem>
-            <DropdownMenuItem>Send Message</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => onApplyLeave?.(employee)}>Apply Leave</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
