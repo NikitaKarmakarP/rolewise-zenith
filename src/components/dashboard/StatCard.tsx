@@ -12,6 +12,7 @@ interface StatCardProps {
   };
   variant?: 'default' | 'primary' | 'accent' | 'success' | 'warning';
   className?: string;
+  onClick?: () => void;
 }
 
 export function StatCard({
@@ -22,6 +23,7 @@ export function StatCard({
   trend,
   variant = 'default',
   className,
+  onClick,
 }: StatCardProps) {
   const iconBgColors = {
     default: 'bg-muted',
@@ -43,8 +45,10 @@ export function StatCard({
     <div
       className={cn(
         'stat-card card-hover rounded-xl border border-border bg-card p-6 shadow-card',
+        onClick && 'cursor-pointer',
         className
       )}
+      onClick={onClick}
     >
       <div className="flex items-start justify-between">
         <div className="space-y-1">
